@@ -1,9 +1,11 @@
-package zeroone.developers.billingappk
+package zeroone.developers.paycart
 
 import jakarta.persistence.EntityManager
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Propagation
+import org.springframework.transaction.annotation.Transactional
 
 interface CategoryService {
     fun getAll(pageable: Pageable): Page<CategoryResponse>
@@ -101,7 +103,7 @@ class CategoryServiceImpl(
     }
 
     override fun delete(id: Long) {
-        categoryRepository.trash(id) ?:throw CategoryNotFoundException()
+        categoryRepository.trash(id) ?: throw CategoryNotFoundException()
     }
 }
 
@@ -137,13 +139,14 @@ class ProductServiceImpl(
     }
 
     override fun delete(id: Long) {
-        productRepository.trash(id) ?:throw ProductNotFoundException()
+        productRepository.trash(id) ?: throw ProductNotFoundException()
     }
 }
 
 @Service
 class TransactionServiceImpl(
     private val transactionRepository: TransactionRepository,
+    private val entityManager: EntityManager
 ) : TransactionService {
 
     override fun getAll(pageable: Pageable): Page<TransactionResponse> {
@@ -164,22 +167,29 @@ class TransactionServiceImpl(
         } ?: throw TransactionNotFoundException()
     }
 
+    //Process 1.
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    override fun create(request: TransactionCreateRequest) {
+        request.run {
+            transactionRepository.findByUserId(userId).orElseThrow { UserNotFoundException() }
+            val referenceUser = entityManager.getReference(User::class.java, userId)
+            transactionRepository.save(this.toEntity(referenceUser))
+        }
+    }
+
     override fun update(id: Long, request: TransactionUpdateRequest) {
         TODO("Not yet implemented")
     }
 
-    override fun create(request: TransactionCreateRequest) {
-        TODO("Not yet implemented")
-    }
-
     override fun delete(id: Long) {
-        transactionRepository.trash(id) ?:throw TransactionNotFoundException()
+        transactionRepository.trash(id) ?: throw TransactionNotFoundException()
     }
 }
 
 @Service
 class TransactionItemServiceImpl(
     private val transactionItemRepository: TransactionItemRepository,
+    private val entityManager: EntityManager
 ) : TransactionItemService {
 
     override fun getAll(pageable: Pageable): Page<TransactionItemResponse> {
@@ -200,8 +210,17 @@ class TransactionItemServiceImpl(
         } ?: throw TransactionItemNotFoundException()
     }
 
+
+    //Process 2.
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     override fun create(request: TransactionItemCreateRequest) {
-        TODO("Not yet implemented")
+        request.run {
+            transactionItemRepository.findByProductId(productId).orElseThrow{ ProductNotFoundException() }
+            transactionItemRepository.findByTransactionId(transactionId).orElseThrow { TransactionNotFoundException() }
+            val referenceProduct = entityManager.getReference(Product::class.java, productId)
+            val referenceTransaction = entityManager.getReference(Transaction::class.java, transactionId)
+            transactionItemRepository.save(this.toEntity(referenceProduct, referenceTransaction))
+        }
     }
 
     override fun update(id: Long, request: TransactionItemUpdateRequest) {
@@ -209,7 +228,7 @@ class TransactionItemServiceImpl(
     }
 
     override fun delete(id: Long) {
-        transactionItemRepository.trash(id) ?:throw TransactionItemNotFoundException()
+        transactionItemRepository.trash(id) ?: throw TransactionItemNotFoundException()
     }
 }
 
@@ -240,7 +259,7 @@ class UserServiceImpl(
         request.run {
             val user = userRepository.findByUsernameAndDeletedFalse(username)
             if (user != null) throw UserAlreadyExistsException()
-
+            userRepository.save(this.toEntity())
         }
     }
 
@@ -249,7 +268,7 @@ class UserServiceImpl(
         request.run {
             fullname?.let { user.fullname = it }
             username?.let {
-                val userExist = userRepository.findByUsernameNotId(id,it)
+                val userExist = userRepository.findByUsernameNotId(id, it)
                 if (userExist != null) throw UserAlreadyExistsException()
                 user.username = it
             }
@@ -259,7 +278,7 @@ class UserServiceImpl(
     }
 
     override fun delete(id: Long) {
-        userRepository.trash(id) ?:throw UserNotFoundException()
+        userRepository.trash(id) ?: throw UserNotFoundException()
     }
 }
 
@@ -288,11 +307,15 @@ class UserPaymentTransactionServiceImpl(
         } ?: throw UserPaymentTransactionNotFoundException()
     }
 
+    //Process 3.
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     override fun create(request: UserPaymentTransactionCreateRequest) {
         request.run {
-            //val u = userRepository.findByIdAndDeletedFalse(userId) ?: throw UserNotFoundException()
-            val userPayment = userPaymentTransactionRepository.findByUserIdAndDeletedFalse(userId)
-            if (userPayment != null) throw UserPaymentTransactionAlreadyExistsException()
+            val user = userPaymentTransactionRepository.findByUserId(userId)
+                .orElseThrow { UserNotFoundException() }
+            if (user.balance.compareTo(request.amount) < 0) throw InvalidBalanceException()
+            user.balance = user.balance.subtract(request.amount)
+            userRepository.save(user)
             val referenceUser = entityManager.getReference(
                 User::class.java,
                 userId
@@ -302,14 +325,17 @@ class UserPaymentTransactionServiceImpl(
     }
 
     override fun update(id: Long, request: UserPaymentTransactionUpdateRequest) {
-        userPaymentTransactionRepository.findByUserIdAndDeletedFalse(id)?: throw UserPaymentTransactionNotFoundException()
+        val userPaymentTransaction = userPaymentTransactionRepository.findByIdAndDeletedFalse(id)
+            ?: throw UserPaymentTransactionNotFoundException()
         request.run {
-            TODO()
+            amount?.let { userPaymentTransaction.amount = it }
         }
+        userPaymentTransactionRepository.save(userPaymentTransaction)
     }
 
+    @Transactional
     override fun delete(id: Long) {
-        userPaymentTransactionRepository.trash(id) ?:throw UserPaymentTransactionNotFoundException()
+        userPaymentTransactionRepository.trash(id) ?: throw UserPaymentTransactionNotFoundException()
     }
 }
 

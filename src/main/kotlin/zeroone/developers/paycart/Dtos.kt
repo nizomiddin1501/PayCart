@@ -1,4 +1,4 @@
-package zeroone.developers.billingappk
+package zeroone.developers.paycart
 
 import jakarta.annotation.Nonnull
 import io.swagger.v3.oas.annotations.media.Schema

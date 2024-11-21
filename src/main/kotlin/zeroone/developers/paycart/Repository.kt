@@ -1,4 +1,4 @@
-package zeroone.developers.billingappk
+package zeroone.developers.paycart
 
 import jakarta.persistence.EntityManager
 import jakarta.transaction.Transactional
@@ -12,7 +12,9 @@ import org.springframework.data.jpa.repository.support.JpaEntityInformation
 import org.springframework.data.jpa.repository.support.SimpleJpaRepository
 import org.springframework.data.repository.NoRepositoryBean
 import org.springframework.data.repository.findByIdOrNull
+import org.springframework.data.repository.query.Param
 import org.springframework.stereotype.Repository
+import java.util.*
 
 @NoRepositoryBean
 interface BaseRepository<T : BaseEntity> : JpaRepository<T, Long>, JpaSpecificationExecutor<T> {
@@ -61,14 +63,32 @@ interface CategoryRepository : BaseRepository<Category> {}
 interface ProductRepository : BaseRepository<Product> {}
 
 @Repository
-interface TransactionItemRepository : BaseRepository<TransactionItem> {}
+interface TransactionItemRepository : BaseRepository<TransactionItem> {
+
+    @Query("select p from product p where p.id = :productId")
+    fun findByProductId(@Param("productId") productId: Long): Optional<Product>
+
+    @Query("select t from transaction t where t.id = :transactionId")
+    fun findByTransactionId(@Param("transactionId") transactionId: Long): Optional<Transaction>
+}
 
 @Repository
-interface TransactionRepository : BaseRepository<Transaction> {}
+interface TransactionRepository : BaseRepository<Transaction> {
+
+
+    @Query("select u from users u where u.id = :userId")
+    fun findByUserId(@Param("userId") userId: Long): Optional<User>
+
+
+}
 
 @Repository
 interface UserPaymentTransactionRepository : BaseRepository<UserPaymentTransaction> {
     fun findByUserIdAndDeletedFalse(userId: Long): User?
+
+    @Query("select u from users u where u.id = :userId")
+    fun findByUserId(@Param("userId") userId: Long): Optional<User>
+
 }
 
 @Repository

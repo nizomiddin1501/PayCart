@@ -1,4 +1,4 @@
-package zeroone.developers.billingappk
+package zeroone.developers.paycart
 
 enum class ErrorCodes(val code:Int) {
     CATEGORY_NOT_FOUND(100),

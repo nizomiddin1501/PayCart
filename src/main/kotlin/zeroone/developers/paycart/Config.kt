@@ -1,4 +1,4 @@
-package zeroone.developers.billingappk
+package zeroone.developers.paycart
 
 import org.modelmapper.ModelMapper
 import org.springframework.context.annotation.Bean

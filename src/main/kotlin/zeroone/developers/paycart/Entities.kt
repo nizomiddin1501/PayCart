@@ -1,4 +1,4 @@
-package zeroone.developers.billingappk
+package zeroone.developers.paycart
 
 import io.swagger.v3.oas.annotations.media.Schema
 import org.hibernate.annotations.ColumnDefault

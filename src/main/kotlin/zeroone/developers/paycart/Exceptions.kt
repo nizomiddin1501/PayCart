@@ -1,4 +1,4 @@
-package zeroone.developers.billingappk
+package zeroone.developers.paycart
 
 import org.springframework.context.i18n.LocaleContextHolder
 import org.springframework.context.support.ResourceBundleMessageSource
@@ -38,6 +38,12 @@ class UserPaymentTransactionAlreadyExistsException : BillingExceptionHandler() {
 }
 
 class UserPaymentTransactionNotFoundException : BillingExceptionHandler() {
+    override fun errorCode(): ErrorCodes {
+        return ErrorCodes.USER_PAYMENT_TRANSACTION_NOT_FOUND
+    }
+}
+
+class InvalidBalanceException : BillingExceptionHandler() {
     override fun errorCode(): ErrorCodes {
         return ErrorCodes.USER_PAYMENT_TRANSACTION_NOT_FOUND
     }
