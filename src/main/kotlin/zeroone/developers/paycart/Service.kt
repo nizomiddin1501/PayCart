@@ -95,11 +95,20 @@ class CategoryServiceImpl(
     }
 
     override fun create(request: CategoryCreateRequest) {
-        TODO("Not yet implemented")
+        request.run {
+            val existsByName = categoryRepository.existsByName(name)
+            if(existsByName) throw CategoryAlreadyExistsException()
+            categoryRepository.save(this.toEntity())
+        }
     }
 
     override fun update(id: Long, request: CategoryUpdateRequest) {
-        TODO("Not yet implemented")
+        val category = categoryRepository.findByIdAndDeletedFalse(id)
+        request.run {
+            name?.let { category!!.name = it }
+            orderValue?.let { category!!.orderValue = it }
+        }
+        categoryRepository.save(category!!)
     }
 
     override fun delete(id: Long) {
@@ -110,6 +119,7 @@ class CategoryServiceImpl(
 @Service
 class ProductServiceImpl(
     private val productRepository: ProductRepository,
+    private val entityManager: EntityManager
 ) : ProductService {
 
     override fun getAll(pageable: Pageable): Page<ProductResponse> {
@@ -131,11 +141,25 @@ class ProductServiceImpl(
     }
 
     override fun create(request: ProductCreateRequest) {
-        TODO("Not yet implemented")
+        request.run {
+            val existsProduct = productRepository.existsByName(name)
+            if (existsProduct) throw ProductAlreadyExistsException()
+            val referenceCategory = entityManager.getReference(
+                Category::class.java, categoryId
+            )
+            productRepository.save(this.toEntity(referenceCategory))
+        }
     }
 
+    //Process 4.
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     override fun update(id: Long, request: ProductUpdateRequest) {
-        TODO("Not yet implemented")
+        val product = productRepository.findByIdAndDeletedFalse(id) ?: throw ProductNotFoundException()
+        request.run {
+            name?.let { product.name = it }
+            count?.let { product.count = it }
+        }
+        productRepository.save(product)
     }
 
     override fun delete(id: Long) {
@@ -215,7 +239,7 @@ class TransactionItemServiceImpl(
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     override fun create(request: TransactionItemCreateRequest) {
         request.run {
-            transactionItemRepository.findByProductId(productId).orElseThrow{ ProductNotFoundException() }
+            transactionItemRepository.findByProductId(productId).orElseThrow { ProductNotFoundException() }
             transactionItemRepository.findByTransactionId(transactionId).orElseThrow { TransactionNotFoundException() }
             val referenceProduct = entityManager.getReference(Product::class.java, productId)
             val referenceTransaction = entityManager.getReference(Transaction::class.java, transactionId)

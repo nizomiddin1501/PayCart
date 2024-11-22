@@ -57,10 +57,20 @@ class BaseRepositoryImpl<T : BaseEntity>(
 
 
 @Repository
-interface CategoryRepository : BaseRepository<Category> {}
+interface CategoryRepository : BaseRepository<Category> {
+
+    @Query(value = "select count(*) > 0 from category c where c.name = :name", nativeQuery = true)
+    fun existsByName(@Param("name") name: String): Boolean
+
+}
 
 @Repository
-interface ProductRepository : BaseRepository<Product> {}
+interface ProductRepository : BaseRepository<Product> {
+
+    @Query(value = "select count(*) > 0 from product p where p.name = :name", nativeQuery = true)
+    fun existsByName(@Param("name") name: String): Boolean
+
+}
 
 @Repository
 interface TransactionItemRepository : BaseRepository<TransactionItem> {
