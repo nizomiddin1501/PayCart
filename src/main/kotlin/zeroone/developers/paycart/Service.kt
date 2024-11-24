@@ -73,7 +73,8 @@ interface UserService {
 
 @Service
 class CategoryServiceImpl(
-    private val categoryRepository: CategoryRepository
+    private val categoryRepository: CategoryRepository,
+    private val entityManager: EntityManager
 ) : CategoryService {
 
     override fun getAll(pageable: Pageable): Page<CategoryResponse> {

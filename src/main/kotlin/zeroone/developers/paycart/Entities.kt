@@ -1,7 +1,5 @@
 package zeroone.developers.paycart
-
 import io.swagger.v3.oas.annotations.media.Schema
-import org.hibernate.annotations.ColumnDefault
 import org.springframework.data.annotation.CreatedBy
 import org.springframework.data.annotation.CreatedDate
 import org.springframework.data.annotation.LastModifiedBy
@@ -22,7 +20,8 @@ open class BaseEntity(
     @LastModifiedDate @Temporal(TemporalType.TIMESTAMP) var modifiedDate: Date? = null,
     @CreatedBy var createdBy: Long? = null,
     @LastModifiedBy var lastModifiedBy: Long? = null,
-    @Column(nullable = false) @ColumnDefault(value = "false") var deleted: Boolean = false
+    //@Column(nullable = false) @ColumnDefault(value = "false") var deleted: Boolean = false
+    @Column(nullable = false) var deleted: Boolean = false
 )
 
 @Entity(name = "category")

@@ -35,7 +35,7 @@ class CategoryController(val service: CategoryService) {
 
     @Operation(summary = "Get all categories with pagination", description = "Fetches categories with pagination support.")
     @ApiResponses(ApiResponse(responseCode = "200", description = "Successfully fetched paginated categories"))
-    @GetMapping
+    @GetMapping("/page")
     fun getAll(pageable: Pageable) = service.getAll(pageable)
 
 
@@ -84,7 +84,7 @@ class ProductController(val service: ProductService) {
 
     @Operation(summary = "Get all products with pagination", description = "Fetches products with pagination support.")
     @ApiResponses(ApiResponse(responseCode = "200", description = "Successfully fetched paginated products"))
-    @GetMapping
+    @GetMapping("/page")
     fun getAll(pageable: Pageable) = service.getAll(pageable)
 
 
@@ -133,7 +133,7 @@ class TransactionController(val service: TransactionService) {
 
     @Operation(summary = "Get all transactions with pagination", description = "Fetches transactions with pagination support.")
     @ApiResponses(ApiResponse(responseCode = "200", description = "Successfully fetched paginated transactions"))
-    @GetMapping
+    @GetMapping("/page")
     fun getAll(pageable: Pageable) = service.getAll(pageable)
 
 
@@ -182,7 +182,7 @@ class TransactionItemController(val service: TransactionItemService) {
 
     @Operation(summary = "Get all transactionItems with pagination", description = "Fetches transactionItems with pagination support.")
     @ApiResponses(ApiResponse(responseCode = "200", description = "Successfully fetched paginated transactionItems"))
-    @GetMapping
+    @GetMapping("/page")
     fun getAll(pageable: Pageable) = service.getAll(pageable)
 
 
@@ -231,7 +231,7 @@ class UserController(val service: UserService) {
 
     @Operation(summary = "Get all users with pagination", description = "Fetches users with pagination support.")
     @ApiResponses(ApiResponse(responseCode = "200", description = "Successfully fetched paginated users"))
-    @GetMapping
+    @GetMapping("/page")
     fun getAll(pageable: Pageable) = service.getAll(pageable)
 
 
@@ -280,7 +280,7 @@ class UserPaymentTransactionController(val service: UserPaymentTransactionServic
 
     @Operation(summary = "Get all userTransactions with pagination", description = "Fetches userTransactions with pagination support.")
     @ApiResponses(ApiResponse(responseCode = "200", description = "Successfully fetched paginated userTransactions"))
-    @GetMapping
+    @GetMapping("/page")
     fun getAll(pageable: Pageable) = service.getAll(pageable)
 
 
