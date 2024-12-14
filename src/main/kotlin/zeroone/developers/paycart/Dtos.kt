@@ -7,6 +7,63 @@ import java.util.*
 
 data class BaseMessage(val code : Int, val message : String?)
 
+
+@Schema(description = "Data transfer object for User CreateRequest")
+data class UserCreateRequest(
+
+    @Schema(description = "User full name", example = "Nizomiddin Mirzanazarov")
+    val fullname: String,
+
+    @Schema(description = "Unique username", example = "nizomiddin097")
+    @field:Nonnull val username: String,
+
+    @Schema(description = "User balance", example = "1000.00")
+    val balance: BigDecimal
+){
+    fun toEntity(): User {
+        return User(fullname,username,balance)
+    }
+}
+
+
+@Schema(description = "Data transfer object for User Response")
+data class UserResponse(
+    @Schema(description = "User ID", example = "1")
+    val id: Long?,
+
+    @Schema(description = "User full name", example = "Nizomiddin Mirzanazarov")
+    val fullname: String?,
+
+    @Schema(description = "Unique username", example = "nizomiddin097")
+    val username: String?,
+
+    @Schema(description = "User balance", example = "1000.00")
+    val balance: BigDecimal?
+){
+    companion object{
+        fun toResponse(user: User): UserResponse {
+            user.run {
+                return UserResponse(id!!, fullname, username, balance)
+            }
+        }
+    }
+}
+
+
+@Schema(description = "Data transfer object for User UpdateRequest")
+data class UserUpdateRequest(
+
+    @Schema(description = "User full name", example = "Nizomiddin Mirzanazarov")
+    val fullname: String,
+
+    @Schema(description = "Unique username", example = "nizomiddin097")
+    val username: String,
+
+    @Schema(description = "User balance", example = "1000.00")
+    val balance: BigDecimal
+)
+
+
 @Schema(description = "Data transfer object for Category CreateRequest")
 data class CategoryCreateRequest(
 
@@ -28,16 +85,16 @@ data class CategoryCreateRequest(
 @Schema(description = "Data transfer object for Category Response")
 data class CategoryResponse(
     @Schema(description = "Category ID", example = "1")
-    val id: Long,
+    val id: Long?,
 
     @Schema(description = "Category name", example = "Electronics")
-    @field:Nonnull val name: String,
+    @field:Nonnull val name: String?,
 
     @Schema(description = "Category order", example = "1")
-    val orderValue: Long,
+    val orderValue: Long?,
 
     @Schema(description = "Category description", example = "All electronic products")
-    val description: String
+    val description: String?
 ){
     companion object{
         fun toResponse(category: Category): CategoryResponse{
@@ -52,13 +109,13 @@ data class CategoryResponse(
 data class CategoryUpdateRequest(
 
     @Schema(description = "Category name", example = "Electronics")
-    @field:Nonnull val name: String?,
+    @field:Nonnull var name: String,
 
     @Schema(description = "Category order", example = "1")
-    val orderValue: Long?,
+    val orderValue: Long,
 
     @Schema(description = "Category description", example = "All electronic products")
-    val description: String?
+    val description: String
 
 )
 
@@ -109,10 +166,10 @@ data class ProductResponse(
 data class ProductUpdateRequest(
 
     @Schema(description = "Product name", example = "Laptop")
-    @field:Nonnull val name: String?,
+    @field:Nonnull val name: String,
 
     @Schema(description = "Product count", example = "50")
-    val count: Long?,
+    val count: Long,
 
 )
 
@@ -137,16 +194,16 @@ data class TransactionCreateRequest(
 @Schema(description = "Data transfer object for Transaction Response")
 data class TransactionResponse(
     @Schema(description = "Transaction ID", example = "1")
-    val id: Long,
+    val id: Long?,
 
     @Schema(description = "User ID who made the transaction", example = "2")
-    val userName: String,
+    val userName: String?,
 
     @Schema(description = "Total amount of the transaction", example = "150.00")
-    val totalAmount: BigDecimal,
+    val totalAmount: BigDecimal?,
 
     @Schema(description = "Date of the transaction", example = "2023-07-11")
-    val date: Date
+    val date: Date?
 ){
     companion object{
         fun toResponse(transaction: Transaction): TransactionResponse {
@@ -161,10 +218,10 @@ data class TransactionResponse(
 data class TransactionUpdateRequest(
 
     @Schema(description = "Total amount of the transaction", example = "150.00")
-    val totalAmount: BigDecimal?,
+    val totalAmount: BigDecimal,
 
     @Schema(description = "Date of the transaction", example = "2023-07-11")
-    val date: Date?
+    val date: Date
 )
 
 
@@ -196,22 +253,22 @@ data class TransactionItemCreateRequest(
 @Schema(description = "Data transfer object for Transaction Item Response")
 data class TransactionItemResponse(
     @Schema(description = "Transaction item ID", example = "1")
-    val id: Long,
+    val id: Long?,
 
     @Schema(description = "Product ID in the transaction", example = "10")
-    val productName: String,
+    val productName: String?,
 
     @Schema(description = "Quantity of the product", example = "2")
-    val count: Long,
+    val count: Long?,
 
     @Schema(description = "Price of the product", example = "75.00")
-    val amount: BigDecimal,
+    val amount: BigDecimal?,
 
     @Schema(description = "Total amount for this item", example = "150.00")
-    val totalAmount: BigDecimal,
+    val totalAmount: BigDecimal?,
 
     @Schema(description = "Transaction ID for the item", example = "5")
-    val transactionTotalAmount: BigDecimal
+    val transactionTotalAmount: BigDecimal?
 ){
     companion object{
         fun toResponse(transactionItem: TransactionItem): TransactionItemResponse {
@@ -226,70 +283,16 @@ data class TransactionItemResponse(
 data class TransactionItemUpdateRequest(
 
     @Schema(description = "Quantity of the product", example = "2")
-    val count: Long?,
+    val count: Long,
 
     @Schema(description = "Price of the product", example = "75.00")
-    val amount: BigDecimal?,
+    val amount: BigDecimal,
 
     @Schema(description = "Total amount for this item", example = "150.00")
-    val totalAmount: BigDecimal?
+    val totalAmount: BigDecimal
 )
 
 
-@Schema(description = "Data transfer object for User CreateRequest")
-data class UserCreateRequest(
-
-    @Schema(description = "User full name", example = "Nizomiddin Mirzanazarov")
-    val fullname: String,
-
-    @Schema(description = "Unique username", example = "nizomiddin097")
-    @field:Nonnull val username: String,
-
-    @Schema(description = "User balance", example = "1000.00")
-    val balance: BigDecimal
-){
-    fun toEntity(): User {
-        return User(fullname,username,balance)
-    }
-}
-
-
-@Schema(description = "Data transfer object for User Response")
-data class UserResponse(
-    @Schema(description = "User ID", example = "1")
-    val id: Long,
-
-    @Schema(description = "User full name", example = "Nizomiddin Mirzanazarov")
-    val fullname: String,
-
-    @Schema(description = "Unique username", example = "nizomiddin097")
-    val username: String,
-
-    @Schema(description = "User balance", example = "1000.00")
-    val balance: BigDecimal
-){
-    companion object{
-        fun toResponse(user: User): UserResponse {
-            user.run {
-                return UserResponse(id!!, fullname, username, balance)
-            }
-        }
-    }
-}
-
-
-@Schema(description = "Data transfer object for User UpdateRequest")
-data class UserUpdateRequest(
-
-    @Schema(description = "User full name", example = "Nizomiddin Mirzanazarov")
-    val fullname: String?,
-
-    @Schema(description = "Unique username", example = "nizomiddin097")
-    val username: String?,
-
-    @Schema(description = "User balance", example = "1000.00")
-    val balance: BigDecimal?
-)
 
 
 @Schema(description = "Data transfer object for User Payment Transaction CreateRequest")
@@ -312,16 +315,16 @@ data class UserPaymentTransactionCreateRequest(
 @Schema(description = "Data transfer object for User Payment Transaction Response")
 data class UserPaymentTransactionResponse(
     @Schema(description = "Payment transaction ID", example = "1")
-    val id: Long,
+    val id: Long?,
 
     @Schema(description = "User ID who made the payment", example = "2")
-    val userName: String,
+    val userName: String?,
 
     @Schema(description = "Amount of the payment", example = "200.00")
-    val amount: BigDecimal,
+    val amount: BigDecimal?,
 
     @Schema(description = "Date of the payment", example = "2023-07-11")
-    val date: Date
+    val date: Date?
 ){
     companion object{
         fun toResponse(userPaymentTransaction: UserPaymentTransaction): UserPaymentTransactionResponse {
@@ -335,14 +338,11 @@ data class UserPaymentTransactionResponse(
 @Schema(description = "Data transfer object for User Payment Transaction UpdateRequest")
 data class UserPaymentTransactionUpdateRequest(
 
-    @Schema(description = "User ID who made the payment", example = "2")
-    @field:Nonnull val userId: Long?,
-
     @Schema(description = "Amount of the payment", example = "200.00")
-    val amount: BigDecimal?,
+    val amount: BigDecimal,
 
     @Schema(description = "Date of the payment", example = "2023-07-11")
-    val date: Date?
+    val date: Date
 )
 
 
